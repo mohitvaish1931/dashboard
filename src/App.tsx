@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Filter, Users, DollarSign, TrendingUp, Activity } from 'lucide-react';
 import BackgroundPattern from './components/BackgroundPattern';
@@ -8,6 +9,12 @@ import ChartCard from './components/ChartCard';
 import FilterPanel from './components/FilterPanel';
 import DataTable from './components/DataTable';
 import Footer from './components/Footer';
+import SearchModal from './components/SearchModal';
+import NotificationPanel from './components/NotificationPanel';
+import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import ReportsPage from './pages/ReportsPage';
 import { 
   statsData, 
   lineChartData, 
@@ -26,7 +33,7 @@ const iconMap = {
   activity: Activity,
 };
 
-function App() {
+const Dashboard: React.FC = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     dateRange: '7days',
@@ -36,14 +43,11 @@ function App() {
 
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
-    // Here you would typically update your data based on filters
     console.log('Filters updated:', newFilters);
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0C1A] text-white overflow-x-hidden">
-      <BackgroundPattern />
-      <Navbar />
+    <>
       <FilterPanel 
         isOpen={isFilterOpen} 
         onClose={() => setIsFilterOpen(false)}
@@ -132,9 +136,44 @@ function App() {
           />
         </div>
       </main>
+    </>
+  );
+};
 
-      <Footer />
-    </div>
+function App() {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-[#0B0C1A] text-white overflow-x-hidden">
+        <BackgroundPattern />
+        <Navbar 
+          onSearchClick={() => setIsSearchOpen(true)}
+          onNotificationClick={() => setIsNotificationOpen(true)}
+        />
+        
+        <SearchModal 
+          isOpen={isSearchOpen} 
+          onClose={() => setIsSearchOpen(false)} 
+        />
+        
+        <NotificationPanel 
+          isOpen={isNotificationOpen} 
+          onClose={() => setIsNotificationOpen(false)} 
+        />
+
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Routes>
+
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

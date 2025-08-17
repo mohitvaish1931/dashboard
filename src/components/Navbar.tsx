@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, Search, Bell, Settings, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { BarChart3, Search, Bell, Settings, User, Menu, X } from 'lucide-react';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onSearchClick: () => void;
+  onNotificationClick: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onSearchClick, onNotificationClick }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: 'Dashboard', path: '/' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Reports', path: '/reports' },
+    { name: 'Settings', path: '/settings' }
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -15,7 +34,8 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center space-x-3"
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-3 cursor-pointer"
           >
             <div className="p-2 rounded-lg bg-gradient-to-r from-pink-500/20 to-mint-500/20 backdrop-blur-sm border border-pink-500/30">
               <BarChart3 className="w-6 h-6 text-pink-400" />
@@ -25,58 +45,126 @@ const Navbar: React.FC = () => {
             </h1>
           </motion.div>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            {['Dashboard', 'Analytics', 'Reports', 'Settings'].map((item, index) => (
+            {navItems.map((item, index) => (
               <motion.button
-                key={item}
+                key={item.name}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="text-gray-300 hover:text-white transition-colors duration-300 relative group"
+                onClick={() => navigate(item.path)}
+                className={`transition-colors duration-300 relative group ${
+                  isActive(item.path) 
+                    ? 'text-white' 
+                    : 'text-gray-300 hover:text-white'
+                }`}
               >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-mint-400 group-hover:w-full transition-all duration-300"></span>
+                {item.name}
+                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-pink-400 to-mint-400 transition-all duration-300 ${
+                  isActive(item.path) ? 'w-full' : 'w-0 group-hover:w-full'
+                }`}></span>
               </motion.button>
             ))}
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
+            {/* Search Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              onClick={onSearchClick}
               className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-pink-400/50 transition-all duration-300"
             >
-              <Search className="w-5 h-5 text-gray-400" />
+              <Search className="w-5 h-5 text-gray-400 hover:text-pink-400 transition-colors" />
             </motion.button>
+
+            {/* Notification Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              onClick={onNotificationClick}
               className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-mint-400/50 transition-all duration-300 relative"
             >
-              <Bell className="w-5 h-5 text-gray-400" />
+              <Bell className="w-5 h-5 text-gray-400 hover:text-mint-400 transition-colors" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></span>
             </motion.button>
+
+            {/* Settings Button */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 transition-all duration-300"
+              onClick={() => navigate('/settings')}
+              className={`p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-yellow-400/50 transition-all duration-300 ${
+                isActive('/settings') ? 'border-yellow-400/50' : ''
+              }`}
             >
-              <Settings className="w-5 h-5 text-gray-400" />
+              <Settings className={`w-5 h-5 transition-colors ${
+                isActive('/settings') ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'
+              }`} />
             </motion.button>
-            <motion.div
+
+            {/* Profile Button */}
+            <motion.button
               whileHover={{ scale: 1.05 }}
-              className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-mint-500 p-0.5"
+              onClick={() => navigate('/profile')}
+              className={`w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-mint-500 p-0.5 ${
+                isActive('/profile') ? 'ring-2 ring-pink-400/50' : ''
+              }`}
             >
               <div className="w-full h-full rounded-full bg-gray-800 flex items-center justify-center">
                 <User className="w-4 h-4 text-gray-300" />
               </div>
-            </motion.div>
+            </motion.button>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-gray-400" />
+              ) : (
+                <Menu className="w-5 h-5 text-gray-400" />
+              )}
+            </motion.button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden mt-4 pt-4 border-t border-white/10"
+          >
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <motion.button
+                  key={item.name}
+                  whileHover={{ scale: 1.02 }}
+                  onClick={() => {
+                    navigate(item.path);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-left p-3 rounded-lg transition-colors ${
+                    isActive(item.path)
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {item.name}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.nav>
   );
