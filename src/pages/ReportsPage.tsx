@@ -10,14 +10,17 @@ import {
   Plus,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Upload
 } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const ReportsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
-
-  const reports = [
+  const { notifications } = useAppContext();
+  const [reports, setReports] = useLocalStorage('reports', [
     {
       id: 1,
       title: 'Monthly Revenue Report',
@@ -84,7 +87,8 @@ const ReportsPage: React.FC = () => {
       format: 'CSV',
       downloads: 67
     }
-  ];
+  ]);
+
 
   const categories = ['all', 'Financial', 'Analytics', 'Performance', 'Marketing', 'Customer'];
   const statuses = ['all', 'completed', 'processing', 'failed'];
@@ -121,6 +125,83 @@ const ReportsPage: React.FC = () => {
     }
   };
 
+  const handleCreateReport = () => {
+    const newReport = {
+      id: Date.now(),
+      title: 'New Custom Report',
+      description: 'Custom report generated from dashboard data',
+      category: 'Analytics',
+      status: 'processing',
+      createdAt: new Date().toISOString().split('T')[0],
+      size: '0 MB',
+      format: 'PDF',
+      downloads: 0
+    };
+    
+    setReports(prev => [newReport, ...prev]);
+    
+    notifications.addNotification({
+      type: 'info',
+      title: 'Report Generation Started',
+      message: 'Your new report is being generated and will be ready shortly.',
+      icon: FileText
+    });
+    
+    // Simulate report completion
+    setTimeout(() => {
+      setReports(prev => prev.map(report => 
+        report.id === newReport.id 
+          ? { ...report, status: 'completed', size: '1.2 MB' }
+          : report
+      ));
+      
+      notifications.addNotification({
+        type: 'success',
+        title: 'Report Ready',
+        message: 'Your custom report has been generated successfully.',
+        icon: CheckCircle
+      });
+    }, 3000);
+  };
+
+  const handleDownload = (report: any) => {
+    // Simulate download
+    setReports(prev => prev.map(r => 
+      r.id === report.id 
+        ? { ...r, downloads: r.downloads + 1 }
+        : r
+    ));
+    
+    notifications.addNotification({
+      type: 'success',
+      title: 'Download Started',
+      message: `Downloading ${report.title}...`,
+      icon: Download
+    });
+  };
+
+  const handleView = (report: any) => {
+    notifications.addNotification({
+      type: 'info',
+      title: 'Opening Report',
+      message: `Opening ${report.title} in viewer...`,
+      icon: Eye
+    });
+  };
+
+  const handleShare = (report: any) => {
+    // Copy share link to clipboard
+    const shareLink = `${window.location.origin}/reports/${report.id}`;
+    navigator.clipboard.writeText(shareLink);
+    
+    notifications.addNotification({
+      type: 'success',
+      title: 'Link Copied',
+      message: 'Report share link copied to clipboard.',
+      icon: Share2
+    });
+  };
+
   return (
     <div className="pt-24 pb-12">
       <div className="container mx-auto px-6">
@@ -142,6 +223,7 @@ const ReportsPage: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleCreateReport}
             className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-mint-500 text-white hover:shadow-lg hover:shadow-pink-500/25 transition-all duration-300"
           >
             <Plus className="w-4 h-4" />
@@ -244,6 +326,7 @@ const ReportsPage: React.FC = () => {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        onClick={() => handleDownload(report)}
                         className="p-2 rounded-lg bg-white/10 hover:bg-mint-500/20 transition-colors"
                         title="Download"
                       >
@@ -252,6 +335,7 @@ const ReportsPage: React.FC = () => {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        onClick={() => handleView(report)}
                         className="p-2 rounded-lg bg-white/10 hover:bg-blue-500/20 transition-colors"
                         title="View"
                       >
@@ -260,6 +344,7 @@ const ReportsPage: React.FC = () => {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        onClick={() => handleShare(report)}
                         className="p-2 rounded-lg bg-white/10 hover:bg-yellow-500/20 transition-colors"
                         title="Share"
                       >

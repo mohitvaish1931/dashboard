@@ -5,7 +5,13 @@ import { Filter, Calendar, BarChart, TrendingUp, X } from 'lucide-react';
 interface FilterPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: FilterState) => void;
+}
+
+export interface FilterState {
+  dateRange: string;
+  chartType: string;
+  category: string;
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onFilterChange }) => {
@@ -14,11 +20,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onFilterChan
   const [category, setCategory] = useState('all');
 
   const handleFilterChange = () => {
-    onFilterChange({
+    const filters: FilterState = {
       dateRange,
       chartType,
       category
-    });
+    };
+    onFilterChange(filters);
   };
 
   React.useEffect(() => {

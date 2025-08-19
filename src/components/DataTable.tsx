@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ChevronDown, ChevronUp, ArrowUpDown } from 'lucide-react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 interface DataTableProps {
   data: any[];
@@ -14,10 +15,10 @@ interface DataTableProps {
 
 const DataTable: React.FC<DataTableProps> = ({ data, columns, delay = 0 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<{
+  const [sortConfig, setSortConfig] = useLocalStorage<{
     key: string;
     direction: 'asc' | 'desc';
-  } | null>(null);
+  } | null>('tableSort', null);
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';

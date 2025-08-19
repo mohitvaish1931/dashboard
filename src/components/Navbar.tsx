@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BarChart3, Search, Bell, Settings, User, Menu, X } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 interface NavbarProps {
   onSearchClick: () => void;
@@ -12,6 +13,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick, onNotificationClick }) =
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { notifications } = useAppContext();
 
   const navItems = [
     { name: 'Dashboard', path: '/' },
@@ -90,7 +92,11 @@ const Navbar: React.FC<NavbarProps> = ({ onSearchClick, onNotificationClick }) =
               className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-mint-400/50 transition-all duration-300 relative"
             >
               <Bell className="w-5 h-5 text-gray-400 hover:text-mint-400 transition-colors" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></span>
+              {notifications.unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 bg-yellow-400 text-black text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+                  {notifications.unreadCount > 9 ? '9+' : notifications.unreadCount}
+                </span>
+              )}
             </motion.button>
 
             {/* Settings Button */}

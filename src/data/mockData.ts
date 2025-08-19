@@ -1,3 +1,5 @@
+import { TrendingUp, Users, Settings, Info, AlertCircle } from 'lucide-react';
+
 // Mock data for the dashboard
 export const statsData = [
   {
@@ -82,4 +84,53 @@ export const tableColumns = [
   { key: 'status', label: 'Status', sortable: true },
   { key: 'revenue', label: 'Revenue ($)', sortable: true },
   { key: 'signupDate', label: 'Signup Date', sortable: true },
+];
+
+// Initial notifications data
+export const initialNotifications = [
+  {
+    id: '1',
+    type: 'success' as const,
+    title: 'Revenue Goal Achieved',
+    message: 'Monthly revenue target of $50K has been reached!',
+    time: '2 minutes ago',
+    read: false,
+    icon: TrendingUp
+  },
+  {
+    id: '2',
+    type: 'info' as const,
+    title: 'New User Milestone',
+    message: 'Congratulations! You\'ve reached 10,000 active users.',
+    time: '1 hour ago',
+    read: false,
+    icon: Users
+  },
+  {
+    id: '3',
+    type: 'warning' as const,
+    title: 'System Maintenance',
+    message: 'Scheduled maintenance will occur tonight at 2 AM EST.',
+    time: '3 hours ago',
+    read: true,
+    icon: Settings
+  },
+  {
+    id: '4',
+    type: 'info' as const,
+    title: 'Weekly Report Ready',
+    message: 'Your weekly analytics report is now available for download.',
+    time: '1 day ago',
+    read: true,
+    icon: Info
+  },
+  {
+    id: '5',
+    type: 'error' as const,
+    title: 'API Rate Limit Warning',
+    message: 'You\'re approaching your API rate limit for this month.',
+    time: '2 days ago',
+    read: false,
+    icon: AlertCircle
+  }
 ];

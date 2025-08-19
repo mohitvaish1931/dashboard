@@ -12,12 +12,18 @@ import {
   X,
   Shield,
   Award,
-  Activity
+  Activity,
+  CheckCircle
 } from 'lucide-react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAppContext } from '../context/AppContext';
 
 const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState({
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const { notifications } = useAppContext();
+  
+  const [profile, setProfile] = useLocalStorage('userProfile', {
     name: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
@@ -33,13 +39,35 @@ const ProfilePage: React.FC = () => {
   const handleSave = () => {
     setProfile(editedProfile);
     setIsEditing(false);
-    // Here you would save to backend
-    console.log('Saving profile:', editedProfile);
+    setShowSaveSuccess(true);
+    
+    notifications.addNotification({
+      type: 'success',
+      title: 'Profile Updated',
+      message: 'Your profile information has been saved successfully.',
+      icon: CheckCircle
+    });
+    
+    setTimeout(() => {
+      setShowSaveSuccess(false);
+    }, 3000);
   };
 
   const handleCancel = () => {
     setEditedProfile(profile);
     setIsEditing(false);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      notifications.addNotification({
+        type: 'info',
+        title: 'Image Upload',
+        message: 'Profile picture upload functionality would be implemented here.',
+        icon: Camera
+      });
+    }
   };
 
   const stats = [
@@ -85,10 +113,18 @@ const ProfilePage: React.FC = () => {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => document.getElementById('profile-image-upload')?.click()}
                     className="absolute bottom-0 right-0 p-2 rounded-full bg-mint-500 text-white hover:bg-mint-600 transition-colors"
                   >
                     <Camera className="w-4 h-4" />
                   </motion.button>
+                  <input
+                    id="profile-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                 </div>
                 <h2 className="text-xl font-semibold text-white mt-4">{profile.name}</h2>
                 <p className="text-gray-400">{profile.role}</p>
@@ -145,10 +181,23 @@ const ProfilePage: React.FC = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={handleSave}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-mint-500 text-white hover:bg-mint-600 transition-colors"
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                        showSaveSuccess
+                          ? 'bg-mint-600 text-white'
+                          : 'bg-mint-500 text-white hover:bg-mint-600'
+                      }`}
                     >
-                      <Save className="w-4 h-4" />
-                      <span>Save</span>
+                      {showSaveSuccess ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Saved!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4" />
+                          <span>Save</span>
+                        </>
+                      )}
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}

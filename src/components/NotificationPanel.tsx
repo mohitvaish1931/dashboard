@@ -1,90 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Check, AlertCircle, Info, TrendingUp, Users, Settings, Trash2 } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 interface NotificationPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  icon: React.ComponentType<any>;
-}
-
 const NotificationPanel: React.FC<NotificationPanelProps> = ({ isOpen, onClose }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'success',
-      title: 'Revenue Goal Achieved',
-      message: 'Monthly revenue target of $50K has been reached!',
-      time: '2 minutes ago',
-      read: false,
-      icon: TrendingUp
-    },
-    {
-      id: '2',
-      type: 'info',
-      title: 'New User Milestone',
-      message: 'Congratulations! You\'ve reached 10,000 active users.',
-      time: '1 hour ago',
-      read: false,
-      icon: Users
-    },
-    {
-      id: '3',
-      type: 'warning',
-      title: 'System Maintenance',
-      message: 'Scheduled maintenance will occur tonight at 2 AM EST.',
-      time: '3 hours ago',
-      read: true,
-      icon: Settings
-    },
-    {
-      id: '4',
-      type: 'info',
-      title: 'Weekly Report Ready',
-      message: 'Your weekly analytics report is now available for download.',
-      time: '1 day ago',
-      read: true,
-      icon: Info
-    },
-    {
-      id: '5',
-      type: 'error',
-      title: 'API Rate Limit Warning',
-      message: 'You\'re approaching your API rate limit for this month.',
-      time: '2 days ago',
-      read: false,
-      icon: AlertCircle
-    }
-  ]);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, read: true }))
-    );
-  };
-
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
-  };
+  const { notifications: notificationHook } = useAppContext();
+  const { notifications, markAsRead, markAllAsRead, deleteNotification, unreadCount } = notificationHook;
 
   const getNotificationColor = (type: string) => {
     switch (type) {

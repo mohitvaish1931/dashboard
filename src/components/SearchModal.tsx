@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, TrendingUp, Users, DollarSign, FileText } from 'lucide-react';
+import { Search, X, Clock, TrendingUp, Users, DollarSign, FileText, BarChart, Settings, User } from 'lucide-react';
+import { useSearch } from '../hooks/useSearch';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -8,35 +10,34 @@ interface SearchModalProps {
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [recentSearches, setRecentSearches] = useState([
-    'Revenue analytics',
-    'User engagement',
-    'Monthly reports',
-    'Dashboard settings'
-  ]);
+  const navigate = useNavigate();
 
-  const searchSuggestions = [
-    { icon: TrendingUp, title: 'Revenue Trends', category: 'Analytics', description: 'View revenue growth patterns' },
-    { icon: Users, title: 'User Analytics', category: 'Users', description: 'Analyze user behavior and engagement' },
-    { icon: DollarSign, title: 'Financial Reports', category: 'Reports', description: 'Access financial data and insights' },
-    { icon: FileText, title: 'Export Data', category: 'Tools', description: 'Export dashboard data to CSV/PDF' },
+  const searchData = [
+    { id: '1', icon: BarChart, title: 'Dashboard', category: 'Navigation', description: 'Main dashboard overview', url: '/' },
+    { id: '2', icon: TrendingUp, title: 'Analytics', category: 'Navigation', description: 'Deep dive analytics', url: '/analytics' },
+    { id: '3', icon: FileText, title: 'Reports', category: 'Navigation', description: 'Generate and view reports', url: '/reports' },
+    { id: '4', icon: Settings, title: 'Settings', category: 'Navigation', description: 'App settings and preferences', url: '/settings' },
+    { id: '5', icon: User, title: 'Profile', category: 'Navigation', description: 'User profile management', url: '/profile' },
+    { id: '6', icon: Users, title: 'User Analytics', category: 'Analytics', description: 'Analyze user behavior and engagement', url: '/analytics' },
+    { id: '7', icon: DollarSign, title: 'Revenue Trends', category: 'Analytics', description: 'View revenue growth patterns', url: '/analytics' },
+    { id: '8', icon: FileText, title: 'Monthly Reports', category: 'Reports', description: 'Access monthly performance reports', url: '/reports' },
+    { id: '9', icon: TrendingUp, title: 'Performance Metrics', category: 'Analytics', description: 'Track key performance indicators', url: '/analytics' },
   ];
 
-  const filteredSuggestions = searchSuggestions.filter(
-    suggestion =>
-      suggestion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      suggestion.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      suggestion.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { query, setQuery, results, recentSearches, addToRecentSearches } = useSearch(searchData);
 
-  const handleSearch = (query: string) => {
-    if (query.trim() && !recentSearches.includes(query)) {
-      setRecentSearches(prev => [query, ...prev.slice(0, 3)]);
+  const handleSearch = (searchTerm: string, url?: string) => {
+    if (searchTerm.trim()) {
+      addToRecentSearches(searchTerm);
+      if (url) {
+        navigate(url);
+      }
     }
-    // Here you would implement actual search functionality
-    console.log('Searching for:', query);
     onClose();
+  };
+
+  const handleResultClick = (result: typeof searchData[0]) => {
+    handleSearch(result.title, result.url);
   };
 
   useEffect(() => {
@@ -85,9 +86,9 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   placeholder="Search dashboard, analytics, reports..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch(query)}
                   className="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-lg"
                   autoFocus
                 />
@@ -103,32 +104,32 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
 
               {/* Search Results */}
               <div className="max-h-96 overflow-y-auto">
-                {searchQuery ? (
+                {query ? (
                   <div className="p-4">
                     <h3 className="text-sm font-medium text-gray-400 mb-3">Search Results</h3>
-                    {filteredSuggestions.length > 0 ? (
+                    {results.length > 0 ? (
                       <div className="space-y-2">
-                        {filteredSuggestions.map((suggestion, index) => (
+                        {results.map((result, index) => (
                           <motion.button
-                            key={index}
+                            key={result.id}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             whileHover={{ scale: 1.02 }}
-                            onClick={() => handleSearch(suggestion.title)}
+                            onClick={() => handleResultClick(result)}
                             className="w-full flex items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 text-left"
                           >
                             <div className="p-2 rounded-lg bg-gradient-to-r from-pink-500/20 to-mint-500/20 mr-3">
-                              <suggestion.icon className="w-4 h-4 text-pink-400" />
+                              <result.icon className="w-4 h-4 text-pink-400" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center space-x-2">
-                                <span className="text-white font-medium">{suggestion.title}</span>
+                                <span className="text-white font-medium">{result.title}</span>
                                 <span className="text-xs px-2 py-1 rounded-full bg-mint-500/20 text-mint-400">
-                                  {suggestion.category}
+                                  {result.category}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-400 mt-1">{suggestion.description}</p>
+                              <p className="text-sm text-gray-400 mt-1">{result.description}</p>
                             </div>
                           </motion.button>
                         ))}
@@ -136,7 +137,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                     ) : (
                       <div className="text-center py-8 text-gray-400">
                         <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No results found for "{searchQuery}"</p>
+                        <p>No results found for "{query}"</p>
                       </div>
                     )}
                   </div>
@@ -170,18 +171,18 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                     <div>
                       <h3 className="text-sm font-medium text-gray-400 mb-3">Quick Actions</h3>
                       <div className="grid grid-cols-2 gap-2">
-                        {searchSuggestions.slice(0, 4).map((suggestion, index) => (
+                        {searchData.slice(0, 4).map((item, index) => (
                           <motion.button
-                            key={index}
+                            key={item.id}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.1 }}
                             whileHover={{ scale: 1.05 }}
-                            onClick={() => handleSearch(suggestion.title)}
+                            onClick={() => handleResultClick(item)}
                             className="flex items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200"
                           >
-                            <suggestion.icon className="w-4 h-4 text-pink-400 mr-2" />
-                            <span className="text-sm text-white">{suggestion.title}</span>
+                            <item.icon className="w-4 h-4 text-pink-400 mr-2" />
+                            <span className="text-sm text-white">{item.title}</span>
                           </motion.button>
                         ))}
                       </div>
