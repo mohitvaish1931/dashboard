@@ -203,13 +203,13 @@ const ReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 space-y-4 md:space-y-0"
         >
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-pink-200 to-mint-200 bg-clip-text text-transparent">
@@ -236,7 +236,7 @@ const ReportsPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap items-center gap-4 mb-8 p-4 rounded-xl bg-white/5 border border-white/10"
+          className="flex flex-wrap items-center gap-4 mb-8 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md"
         >
           <div className="flex items-center space-x-2">
             <Filter className="w-4 h-4 text-gray-400" />
@@ -246,10 +246,10 @@ const ReportsPage: React.FC = () => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-mint-400/50"
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-mint-400/50 min-w-[120px]"
           >
             {categories.map(category => (
-              <option key={category} value={category}>
+              <option key={category} value={category} className="bg-gray-800 text-white">
                 {category === 'all' ? 'All Categories' : category}
               </option>
             ))}
@@ -258,10 +258,10 @@ const ReportsPage: React.FC = () => {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-mint-400/50"
+            className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-mint-400/50 min-w-[120px]"
           >
             {statuses.map(status => (
-              <option key={status} value={status}>
+              <option key={status} value={status} className="bg-gray-800 text-white">
                 {status === 'all' ? 'All Status' : status.charAt(0).toUpperCase() + status.slice(1)}
               </option>
             ))}
@@ -269,7 +269,7 @@ const ReportsPage: React.FC = () => {
         </motion.div>
 
         {/* Reports Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {filteredReports.map((report, index) => (
             <motion.div
               key={report.id}
@@ -387,7 +387,7 @@ const ReportsPage: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12"
+            className="text-center py-12 mb-12"
           >
             <FileText className="w-16 h-16 mx-auto mb-4 text-gray-500" />
             <h3 className="text-xl font-semibold text-white mb-2">No reports found</h3>

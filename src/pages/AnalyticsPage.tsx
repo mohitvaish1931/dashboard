@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Users, DollarSign, Activity, Calendar, Download } from 'lucide-react';
 import ChartCard from '../components/ChartCard';
 import StatsCard from '../components/StatsCard';
+import { useAppContext } from '../context/AppContext';
 
 const AnalyticsPage: React.FC = () => {
   const [timeRange, setTimeRange] = useState('30days');
+  const { notifications } = useAppContext();
 
   const analyticsStats = [
     {
@@ -70,13 +72,13 @@ const AnalyticsPage: React.FC = () => {
   };
 
   return (
-    <div className="pt-24 pb-12">
+    <div className="min-h-screen pt-24 pb-12">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 space-y-4 md:space-y-0"
         >
           <div>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white via-pink-200 to-mint-200 bg-clip-text text-transparent">
@@ -87,7 +89,7 @@ const AnalyticsPage: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <div className="flex items-center space-x-2">
               <Calendar className="w-5 h-5 text-gray-400" />
               <select
@@ -105,6 +107,14 @@ const AnalyticsPage: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                notifications.addNotification({
+                  type: 'success',
+                  title: 'Export Started',
+                  message: 'Analytics data export has been initiated.',
+                  icon: Download
+                });
+              }}
               className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500/20 to-mint-500/20 border border-pink-500/30 text-white hover:border-pink-400/50 transition-all duration-300"
             >
               <Download className="w-4 h-4" />
@@ -164,10 +174,13 @@ const AnalyticsPage: React.FC = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12"
         >
           {/* Top Pages */}
-          <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10">
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
             <h3 className="text-xl font-semibold text-white mb-4">Top Pages</h3>
             <div className="space-y-3">
               {[
@@ -187,10 +200,13 @@ const AnalyticsPage: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Traffic Sources */}
-          <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10">
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
             <h3 className="text-xl font-semibold text-white mb-4">Traffic Sources</h3>
             <div className="space-y-3">
               {[
@@ -215,10 +231,13 @@ const AnalyticsPage: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Real-time Activity */}
-          <div className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10">
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="p-6 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300"
+          >
             <h3 className="text-xl font-semibold text-white mb-4">Real-time Activity</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -248,7 +267,7 @@ const AnalyticsPage: React.FC = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
